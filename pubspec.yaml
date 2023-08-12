@@ -48,6 +48,7 @@ dependencies:
   persistent_bottom_nav_bar: ^5.0.2
   url_launcher: ^6.0.0
   timezone: ^0.7.0
+  device_info: ^2.0.0
   #flutter_native_timezone: ^1.0.0
 
 dev_dependencies:

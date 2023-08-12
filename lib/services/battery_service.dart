@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:http/http.dart' as http;
+import 'package:power_detector/services/device_id_service.dart';
 import 'package:power_detector/utils/app_constants.dart';
 import 'package:timezone/timezone.dart' as tz;
 
@@ -12,13 +13,12 @@ class BatteryService with WidgetsBindingObserver {
   static var battery = Battery();
   //static int level = 100;
   //static BatteryState batteryState = BatteryState.full;
-  
+
   static late Timer timer;
   static late StreamSubscription streamSubscription;
 
   static final RxInt batteryLevel = 100.obs;
   static final Rx<BatteryState> batteryState = BatteryState.full.obs;
-
 
   static void initBatteryListener() {
     getBatteryPercentage();
@@ -33,7 +33,6 @@ class BatteryService with WidgetsBindingObserver {
     batteryLevel.value = batteryLevelValue;
   }
 
-
   // static void getBatteryPercentage() async {
   //   final batteryLevel = await battery.batteryLevel;
   //   //level = batteryLevel;
@@ -44,9 +43,9 @@ class BatteryService with WidgetsBindingObserver {
   // }
 
   static void getBatteryState() {
-    streamSubscription = battery.onBatteryStateChanged.listen((state) {
+    streamSubscription = battery.onBatteryStateChanged.listen((state) async {
       batteryState.value = state;
-        
+
       late String powerStatus;
       if (state == BatteryState.charging) {
         powerStatus = 'ON';
@@ -58,9 +57,12 @@ class BatteryService with WidgetsBindingObserver {
       if (powerStatus != 'NULL') {
         // log locally
         logHistory(powerStatus);
-
+        
         String? storedUrl = GetStorage().read(AppConstants.SITE_URL);
-        String webUrl = '$storedUrl?status=$powerStatus';
+        String uniqueDeviceId = await DeviceIdService.getDeviceId();
+
+        String webUrl =
+            '$storedUrl?deviceId=$uniqueDeviceId&status=$powerStatus&level=$batteryLevel';
         bool isValidUrl = isValidUri(webUrl);
         if (isValidUrl) {
           // log to server

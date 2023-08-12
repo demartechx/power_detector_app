@@ -4,6 +4,7 @@ import 'package:gap/gap.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:iconsax/iconsax.dart';
+import 'package:power_detector/services/battery_service.dart';
 import 'package:power_detector/services/theme_services.dart';
 import 'package:power_detector/utils/app_constants.dart';
 import 'package:power_detector/utils/dimensions.dart';
@@ -31,9 +32,13 @@ class _SettingsState extends State<Settings> {
 
   void _urlProcess() {
     String url = urlController.text.trim();
+    bool isValidUrl = BatteryService.isValidUri(url);
 
     if (url.isEmpty) {
-      showCustomSnackBar("The url is empty", title: "Error");
+      showCustomSnackBar("The url is empty.", title: "Error");
+    } else if (!isValidUrl) {
+      showCustomSnackBar("The url is invalid, kindly input a valid URL.",
+          title: "Error");
     } else {
       setState(() {
         isLoading = true;

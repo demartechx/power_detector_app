@@ -12,6 +12,9 @@ Future<void> main() async {
   await GetStorage.init();
   tz.initializeTimeZones();
   BatteryService.initBatteryListener();
+
+  
+
   runApp(const MyApp());
 }
 
